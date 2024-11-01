@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const userRouter = require("./routes/userRoutes");
 //  na3mlou importation mta3 mongoos ali howa el ODM mte3na (OBJECT DATA MODELING)
 // bech nesta3mlouh to create our connection with mongoDB
 const mongoose = require("mongoose");
@@ -23,6 +24,7 @@ mongoose
 
 const app = express();
 app.use(express.json());
+app.use("/users", userRouter);
 
 const port = 7900;
 
