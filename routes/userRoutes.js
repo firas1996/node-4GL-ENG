@@ -8,10 +8,7 @@ const {
 const express = require("express");
 const router = express.Router();
 
-router.route("/").post(createUser);
-router.route("/").get(GetUsers);
-router.route("/:id").get(getUserById);
-router.route("/:id").patch(updateUser);
-router.route("/:id").delete(deleteUser);
+router.route("/").post(createUser).get(GetUsers);
+router.route("/:id").get(getUserById).patch(updateUser).delete(deleteUser);
 
 module.exports = router;

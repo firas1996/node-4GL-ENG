@@ -19,7 +19,9 @@ exports.createUser = async (req, res) => {
 
 exports.GetUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    // const users = await User.find().where("name").equals(req.query.name);
+    let querry = { ...req.query };
+    const users = await User.find(querry);
     res.status(200).json({
       message: "Users Fetched !",
       data: { users },
@@ -69,7 +71,7 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
-    res.status(204).json({
+    res.status(203).json({
       message: "User Deleted !",
     });
   } catch (err) {
