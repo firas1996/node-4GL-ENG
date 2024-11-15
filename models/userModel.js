@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    select: false,
+    // select: false,
   },
   age: Number,
   created_at: {
