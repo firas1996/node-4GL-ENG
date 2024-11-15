@@ -65,3 +65,17 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
+
+exports.deleteUser = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(204).json({
+      message: "User Deleted !",
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: "fail",
+      err: err,
+    });
+  }
+};
