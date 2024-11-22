@@ -34,7 +34,15 @@ exports.GetUsers = async (req, res) => {
     const limit = req.query.limit * 1 || 2;
     const skip = (page - 1) * limit;
     qq = qq.skip(skip).limit(limit);
-
+    const nbrUsers = await User.countDocuments();
+    console.log(nbrUsers);
+    if (skip >= nbrUsers) {
+      console.log("aaa");
+      // throw new Error("This page does not exist !!!");
+      res.status(404).json({
+        message: "fail",
+      });
+    }
     const users = await qq;
     res.status(200).json({
       message: "Users Fetched !",
