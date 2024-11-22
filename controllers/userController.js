@@ -1,3 +1,4 @@
+const { json } = require("express");
 const User = require("../models/userModel");
 
 exports.createUser = async (req, res) => {
@@ -21,7 +22,20 @@ exports.GetUsers = async (req, res) => {
   try {
     // const users = await User.find().where("name").equals(req.query.name);
     let querry = { ...req.query };
-    const users = await User.find(querry);
+    let imposters = ["page", "limit"];
+    imposters.forEach((el) => delete querry[el]);
+    // 1) Filtering:
+    let querryS = JSON.stringify(querry);
+    querryS = querryS.replace(/\b(gt|gte|lt|lte)\b/g, (x) => `$${x}`);
+    console.log(querryS);
+    let qq = User.find(JSON.parse(querryS));
+    // 2) Pagination:
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 2;
+    const skip = (page - 1) * limit;
+    qq = qq.skip(skip).limit(limit);
+
+    const users = await qq;
     res.status(200).json({
       message: "Users Fetched !",
       data: { users },
