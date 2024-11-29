@@ -22,7 +22,7 @@ exports.GetUsers = async (req, res) => {
   try {
     // const users = await User.find().where("name").equals(req.query.name);
     let querry = { ...req.query };
-    let imposters = ["page", "limit"];
+    let imposters = ["page", "limit", "sort"];
     imposters.forEach((el) => delete querry[el]);
     // 1) Filtering:
     let querryS = JSON.stringify(querry);
@@ -43,6 +43,15 @@ exports.GetUsers = async (req, res) => {
         message: "fail",
       });
     }
+
+    // 3) Sorting:
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      qq = qq.sort(sortBy);
+    } else {
+      qq = qq.sort("-created_at");
+    }
+
     const users = await qq;
     res.status(200).json({
       message: "Users Fetched !",
