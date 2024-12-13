@@ -1,4 +1,3 @@
-const { json } = require("express");
 const User = require("../models/userModel");
 const APIFeatures = require("../utils/APIFeatures");
 
