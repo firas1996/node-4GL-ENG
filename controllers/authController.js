@@ -1,4 +1,11 @@
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
+
+const createToken = (id, name) => {
+  return jwt.sign({ id, name }, process.env.SECRET_KEY, {
+    expiresIn: "15d",
+  });
+};
 
 exports.signup = async (req, res) => {
   try {
@@ -32,14 +39,15 @@ exports.login = async (req, res) => {
     }
     // 1) bech nthabat el user mawjoud wala lé && pass s7ii7
     const user = await User.findOne({ email });
-    if (!user || !user.verifPassword(user.password, password)) {
+    if (!user || !(await user.verifPassword(user.password, password))) {
       return res.status(400).json({
         message: "email or password are incorrect !!!",
       });
     }
+    const token = createToken(user._id, user.name);
     res.status(201).json({
       message: "User logged in !!!",
-      data: { user },
+      token,
     });
   } catch (error) {
     res.status(400).json({
