@@ -61,6 +61,13 @@ userSchema.methods.verifPassword = async function (cryptedPass, userPass) {
   return await bcrypt.compare(userPass, cryptedPass);
 };
 
+userSchema.methods.dateChangePass = function (JWTDate) {
+  const passTime = parseInt(this.pass_change_time.getTime() / 1000);
+  console.log(JWTDate);
+  console.log(passTime);
+  return JWTDate < passTime;
+};
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

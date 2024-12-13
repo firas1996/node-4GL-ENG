@@ -1,4 +1,9 @@
-const { signup, login } = require("../controllers/authController");
+const {
+  signup,
+  login,
+  protectorMW,
+  checkRoleMW,
+} = require("../controllers/authController");
 const {
   createUser,
   GetUsers,
@@ -10,7 +15,14 @@ const express = require("express");
 const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
-router.route("/").post(createUser).get(GetUsers);
-router.route("/:id").get(getUserById).patch(updateUser).delete(deleteUser);
+router
+  .route("/")
+  .post(protectorMW, createUser)
+  .get(protectorMW, checkRoleMW("admin", "user"), GetUsers);
+router
+  .route("/:id")
+  .get(protectorMW, getUserById)
+  .patch(protectorMW, updateUser)
+  .delete(protectorMW, deleteUser);
 
 module.exports = router;

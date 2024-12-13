@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const { promisify } = require("util");
 
 const createToken = (id, name) => {
   return jwt.sign({ id, name }, process.env.SECRET_KEY, {
@@ -55,4 +56,69 @@ exports.login = async (req, res) => {
       err: error,
     });
   }
+};
+
+exports.protectorMW = async (req, res, next) => {
+  try {
+    let token;
+
+    // 1) bech nthabat ken el user 3ando token or not
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+    if (!token) {
+      return res.status(401).json({
+        message: "ypu are not logged in !!!",
+      });
+    }
+    // 2) bech nthabat ken el token ala 3ana valid or not
+
+    const verified = await promisify(jwt.verify)(token, process.env.SECRET_KEY);
+    console.log(verified);
+    // 3) bech t'thabat ken el user tfasa5 wala mizel mawjoud
+
+    const theUser = await User.findById(verified.id);
+    if (!theUser) {
+      return res.status(401).json({
+        message: "token no longer valid !!!",
+      });
+    }
+    // 4) bech nthabtou ken el token tsan3et 9bal ma yetbadal el pass
+
+    if (theUser.dateChangePass(verified.iat)) {
+      return res.status(401).json({
+        message: "token no longer valid !!!",
+      });
+    }
+    req.role = theUser.role;
+    next();
+  } catch (error) {
+    res.status(400).json({
+      message: "fail",
+      err: error,
+    });
+  }
+};
+
+exports.checkRoleMW = (...roles) => {
+  return async (req, res, next) => {
+    try {
+      //   console.log(req.role);
+      if (!roles.includes(req.role)) {
+        return res.status(401).json({
+          message: "you can not do this !!!",
+        });
+      }
+
+      next();
+    } catch (error) {
+      res.status(400).json({
+        message: "fail",
+        err: error,
+      });
+    }
+  };
 };
